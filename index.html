@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dinâmica do Sonho — Tapetes</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="logo">Dinâmica do Sonho</h1>
+      <nav class="top-nav">
+        <a href="#sobre" data-i18n="menu_about">Sobre</a>
+        <a href="#tipos" data-i18n="menu_types">Tipos</a>
+        <a href="#galeria" data-i18n="menu_gallery">Galeria</a>
+        <a href="#visualizer" data-i18n="menu_visualizer">Visualizador</a>
+        <a href="#contato" data-i18n="menu_contact">Contato</a>
+        <a class="whatsapp" id="whatsapp-link" href="https://wa.me/351918393290" target="_blank">WhatsApp</a>
+        <select id="lang-selector">
+          <option value="pt">🇵🇹 PT</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="fr">🇫🇷 FR</option>
+          <option value="es">🇪🇸 ES</option>
+        </select>
+        <button id="open-chat" class="chat-btn" data-i18n="chat_button">Fale com a IA</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <h2 data-i18n="hero_title">Mais de 15 anos de tradição em tapetes</h2>
+          <p data-i18n="hero_sub">Estoque completo: tapetes industriais, persas e orientais feitos à mão. Atendimento humano e por IA para recomendar o tapete perfeito.</p>
+          <a class="btn" href="#contato" data-i18n="hero_cta">Agende uma visita</a>
+        </div>
+        <div class="hero-image">
+          <img src="images/hero-placeholder.jpg" alt="Sala com tapete" />
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre" class="container about">
+      <h3 data-i18n="about_title">Sobre nós</h3>
+      <p data-i18n="about_text">Há mais de 15 anos, a Dinâmica do Sonho combina tradição e conhecimento com um amplo stock que vai desde tapetes industriais até raridades persas e orientais feitas à mão.</p>
+    </section>
+
+    <section id="tipos" class="container types">
+      <h3 data-i18n="types_title">Tipos de tapetes</h3>
+      <div class="cards">
+        <div class="card">
+          <h4 data-i18n="type_industrial_title">Industriais</h4>
+          <p data-i18n="type_industrial_text">Resistentes e fáceis de limpar — ideais para áreas de circulação e espaços comerciais.</p>
+          <img src="images/industrial-room.jpg" alt="Industrial room" class="example-img">
+        </div>
+        <div class="card">
+          <h4 data-i18n="type_handmade_title">Feitos à mão (Persas/Orientais)</h4>
+          <p data-i18n="type_handmade_text">Peças artísticas e duradouras, perfeitas para salas e ambientes que valorizam estética e cultura.</p>
+          <img src="images/persian-room.jpg" alt="Persian room" class="example-img">
+        </div>
+        <div class="card">
+          <h4 data-i18n="type_outdoor_title">Para áreas externas</h4>
+          <p data-i18n="type_outdoor_text">Materiais tratados para variações climáticas — ideais para varandas e áreas cobertas.</p>
+          <img src="images/outdoor-room.jpg" alt="Outdoor room" class="example-img">
+        </div>
+      </div>
+    </section>
+
+    <section id="galeria" class="container gallery">
+      <h3 data-i18n="gallery_title">Galeria — tapetes em stock</h3>
+      <p>Na galeria abaixo pode adicionar os seus tapetes (foto, descrição, preço). Estes itens são guardados localmente no servidor (arquivo JSON).</p>
+      <div id="stock-list" class="stock-list"></div>
+
+      <h4>Adicionar novo tapete ao stock (temporariamente local)</h4>
+      <form id="add-stock-form">
+        <input name="title" placeholder="Título" required>
+        <input name="price" placeholder="Preço (ex: 250€)" required>
+        <input name="imageUrl" placeholder="URL da imagem (ou deixe em branco para um placeholder)">
+        <textarea name="desc" placeholder="Descrição"></textarea>
+        <button type="submit">Adicionar ao stock</button>
+      </form>
+    </section>
+
+    <section id="visualizer" class="container visualizer">
+      <h3 data-i18n="visualizer_title">Visualizador - aplique um tapete numa foto de ambiente</h3>
+      <p>Faça upload de uma foto de ambiente (sala, quarto, cozinha) e selecione um tapete da galeria para sobrepor. Ajuste escala/posição/rotação/opacity para visualizar.</p>
+      <div class="visualizer-controls">
+        <label>Foto do ambiente: <input id="room-file" type="file" accept="image/*"></label>
+        <label>Escolher tapete: <select id="visualizer-rugs"></select></label>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="visualizer-canvas" width="1000" height="700"></canvas>
+      </div>
+      <div class="overlay-controls">
+        <label>Scale: <input id="r-scale" type="range" min="0.1" max="3" step="0.01" value="1"></label>
+        <label>Rotate: <input id="r-rotate" type="range" min="-180" max="180" step="1" value="0"></label>
+        <label>Opacity: <input id="r-opacity" type="range" min="0" max="1" step="0.01" value="1"></label>
+        <button id="download-visual">Download Preview</button>
+      </div>
+      <p class="note">Nota: esta ferramenta faz uma simulação 2D por sobreposição. Para AR avançado, integração com WebAR/3D é recomendada.</p>
+    </section>
+
+    <section id="contato" class="container contact">
+      <h3 data-i18n="contact_title">Contato</h3>
+      <p><strong data-i18n="contact_phone_label">Telefone:</strong> +351 918393290</p>
+      <p><strong data-i18n="contact_address_label">Endereço:</strong> Rua Paulo VI 89B - 2410-169 - Leiria - Portugal</p>
+      <p><strong data-i18n="contact_hours_label">Horário:</strong> Seg–Sáb 9:00–19:00</p>
+      <div class="contact-links">
+        <a class="btn" id="maps-link" target="_blank">Ver no Google Maps</a>
+        <a class="social" href="#" id="facebook-link" target="_blank">Facebook</a>
+        <a class="social" href="#" id="instagram-link" target="_blank">Instagram</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="year"></span> Dinâmica do Sonho — +15 anos de tradição</p>
+    </div>
+  </footer>
+
+  <!-- Chat widget -->
+  <div id="chat-widget" class="chat-closed">
+    <div class="chat-header">
+      <strong data-i18n="chat_header">Atendimento IA — Dinâmica do Sonho</strong>
+      <button id="close-chat">×</button>
+    </div>
+    <div id="chat-body" class="chat-body"></div>
+    <form id="chat-form" class="chat-form">
+      <input type="text" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Escreva sua pergunta..." autocomplete="off" />
+      <button type="submit" data-i18n="chat_send">Enviar</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

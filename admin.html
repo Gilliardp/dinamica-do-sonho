@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Dinâmica do Sonho</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f6f6f6;color:#222}
+    .card{background:#fff;padding:12px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.04);margin-bottom:12px}
+    input,textarea,select{width:100%;padding:8px;margin:6px 0;border:1px solid #ddd;border-radius:6px}
+    button{background:#b85c3c;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    .small{width:120px}
+    img.thumb{width:120px;height:80px;object-fit:cover;border-radius:6px}
+  </style>
+</head>
+<body>
+  <h2>Admin — Dinâmica do Sonho</h2>
+  <div id="login-section" class="card">
+    <h3>Login</h3>
+    <p>Entre com a senha de administrador (senha padrão: <strong>alfredo123</strong>)</p>
+    <input type="password" id="admin-password" placeholder="Senha" />
+    <button id="btn-login">Entrar</button>
+    <p id="login-msg" style="color:red"></p>
+  </div>
+
+  <div id="admin-panel" style="display:none">
+    <div class="card">
+      <h3>Adicionar novo tapete</h3>
+      <div class="row">
+        <div class="col">
+          <input id="new-title" placeholder="Título" />
+          <input id="new-price" placeholder="Preço (ex: 250€)" />
+          <textarea id="new-desc" placeholder="Descrição"></textarea>
+        </div>
+        <div class="col small">
+          <input type="file" id="new-image-file" accept="image/*" />
+          <button id="upload-btn">Upload Imagem</button>
+          <p id="upload-url"></p>
+        </div>
+      </div>
+      <button id="add-btn">Adicionar ao stock</button>
+    </div>
+
+    <div class="card">
+      <h3>Stock atual</h3>
+      <div id="stock-list"></div>
+    </div>
+
+    <div class="card">
+      <button id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+<script>
+async function fetchStock(){ const r=await fetch('/api/stock'); return r.json(); }
+function el(t){ return document.createElement(t); }
+
+async function renderStock(){
+  const list = document.getElementById('stock-list');
+  list.innerHTML = '';
+  const items = await fetchStock();
+  items.forEach(it=>{
+    const div = el('div'); div.className='card';
+    div.innerHTML = `<div style="display:flex;gap:12px">
+      <img class="thumb" src="${it.image}" />
+      <div style="flex:1">
+        <h4>${it.title} - <small>${it.price}</small></h4>
+        <p>${it.desc}</p>
+        <div style="display:flex;gap:8px">
+          <button onclick="editItem(${it.id})">Editar</button>
+          <button onclick="deleteItem(${it.id})">Eliminar</button>
+        </div>
+      </div>
+    </div>`;
+    list.appendChild(div);
+  });
+}
+
+async function login(){
+  const pwd = document.getElementById('admin-password').value;
+  const r = await fetch('/admin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pwd})});
+  if(r.ok){ document.getElementById('login-section').style.display='none'; document.getElementById('admin-panel').style.display='block'; renderStock(); }
+  else { const msg = await r.json(); document.getElementById('login-msg').innerText = msg.error || 'Erro'; }
+}
+
+async function uploadImage(){
+  const file = document.getElementById('new-image-file').files[0];
+  if(!file){ alert('Escolha um ficheiro'); return; }
+  const fd = new FormData(); fd.append('image', file);
+  const r = await fetch('/api/upload', { method:'POST', body: fd });
+  if(r.ok){ const j = await r.json(); document.getElementById('upload-url').innerText = j.url; return j.url; }
+  else { alert('Erro no upload'); }
+}
+
+async function addItem(){
+  const title = document.getElementById('new-title').value;
+  const price = document.getElementById('new-price').value;
+  const desc = document.getElementById('new-desc').value;
+  let image = document.getElementById('upload-url').innerText || '/images/stock-1.jpg';
+  const r = await fetch('/api/stock', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title, price, desc, image }) });
+  if(r.ok){ alert('Adicionado'); renderStock(); document.getElementById('new-title').value=''; document.getElementById('new-price').value=''; document.getElementById('new-desc').value=''; document.getElementById('upload-url').innerText=''; }
+  else { alert('Erro ao adicionar'); }
+}
+
+window.editItem = async function(id){
+  const items = await fetchStock();
+  const it = items.find(x=>x.id===id);
+  const newTitle = prompt('Título', it.title);
+  const newPrice = prompt('Preço', it.price);
+  const newDesc = prompt('Descrição', it.desc);
+  if(newTitle!==null){
+    const r = await fetch('/api/stock/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title:newTitle, price:newPrice, desc:newDesc }) });
+    if(r.ok){ alert('Atualizado'); renderStock(); } else alert('Erro');
+  }
+}
+
+window.deleteItem = async function(id){
+  if(!confirm('Confirmar eliminação?')) return;
+  const r = await fetch('/api/stock/'+id, { method:'DELETE' });
+  if(r.ok){ alert('Eliminado'); renderStock(); } else alert('Erro');
+}
+
+document.getElementById('btn-login').addEventListener('click', login);
+document.getElementById('upload-btn').addEventListener('click', async (e)=>{ e.preventDefault(); await uploadImage(); });
+document.getElementById('add-btn').addEventListener('click', addItem);
+document.getElementById('logout-btn').addEventListener('click', async ()=>{ await fetch('/admin/logout', { method:'POST' }); location.reload(); });
+</script>
+</body>
+</html>
